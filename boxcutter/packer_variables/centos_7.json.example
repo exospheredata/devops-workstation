@@ -1,0 +1,20 @@
+{
+  "vcenter_host": "",
+  "vcenter_user": "",
+  "vcenter_password": "",
+  "ssh_user": "vagrant",
+  "ssh_password": "vagrant",
+  "dc": "",
+  "cluster": "",
+  "network": "VM Network",
+  "vm_datastore": "",
+  "template_dir": "Templates",
+  "template_name": "centos7_base",
+  "iso_datastore": "",
+  "iso_path": "packer_cache/CentOS-7-x86_64-Minimal-1804.iso",
+  "ks_file": "custom_scripts/centos/http/7/ks.cfg",
+  "cpu_cores": "2",
+  "ram_mb": "1024",
+  "disk_size_gb": "8",
+  "template_root": "linux"
+}

@@ -1,0 +1,5 @@
+*packerlog.txt
+*manifest.json*
+*packer_cache
+
+packer_variables/*.json

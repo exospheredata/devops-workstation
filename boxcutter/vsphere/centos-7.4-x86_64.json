@@ -1,0 +1,92 @@
+{
+  "variables": {
+    "vcenter_host": "",
+    "vcenter_user": "",
+    "vcenter_password": "",
+    "ssh_user": "vagrant",
+    "ssh_password": "vagrant",
+    "dc": "",
+    "cluster": "",
+    "network": "VM Network",
+    "vm_datastore": "",
+    "template_dir": "Templates",
+    "template_name": "centos7_base",
+    "iso_datastore": "",
+    "iso_path": "",
+    "ks_file": "custom_scripts/centos/http/7/ks.cfg",
+    "cpu_cores": "2",
+    "ram_mb": "1024",
+    "disk_size_gb": "8",
+    "template_root": "linux"
+  },
+
+  "builders": [{
+    "type": "vsphere-iso",
+    "boot_command": [
+      "<up><wait><tab> text net.ifnames=0 ipv6.disable=1 inst.ks=hd:fd0:/ks.cfg<enter><wait>"
+    ],
+
+    "vcenter_server": "{{ user `vcenter_host` }}",
+    "username": "{{ user `vcenter_user` }}",
+    "password": "{{ user `vcenter_password` }}",
+    "insecure_connection": "true",
+    "ssh_username": "{{ user `ssh_user` }}",
+    "ssh_password": "{{ user `ssh_password` }}",
+
+    "datacenter": "{{ user `dc` }}",
+    "cluster": "{{ user `cluster` }}",
+    "network": "{{ user `network` }}",
+    "network_card": "vmxnet3",
+    "datastore": "{{ user `vm_datastore` }}",
+    "vm_name": "{{ user `template_name` }}",
+    "guest_os_type": "centos7_64Guest",
+
+    "CPUs": "{{ user `cpu_cores` }}",
+    "RAM": "{{ user `ram_mb` }}",
+    "RAM_reserve_all": false,
+
+    "disk_controller_type": "pvscsi",
+    "disk_size": "{{ user `disk_size_gb` }}",
+    "disk_thin_provisioned": true,
+    "folder": "{{ user `template_dir` }}",
+
+    "iso_paths": [
+      "[{{ user `iso_datastore` }}] {{ user `iso_path` }}",
+      "[] /vmimages/tools-isoimages/linux.iso"
+    ],
+    "floppy_files": [
+      "{{ user `ks_file` }}"
+    ],
+    "boot_order": "disk,cdrom",
+    "convert_to_template": false
+  }],
+
+  "provisioners": [
+    {
+      "environment_vars": [
+        "HOME_DIR=/home/vagrant",
+        "http_proxy={{user `http_proxy`}}",
+        "https_proxy={{user `https_proxy`}}",
+        "no_proxy={{user `no_proxy`}}"
+      ],
+      "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E sh -eux '{{.Path}}'",
+      "expect_disconnect": true,
+      "scripts": [
+        "{{user `template_root`}}/centos/scripts/update.sh",
+        "{{user `template_root`}}/_common/sshd.sh",
+        "custom_scripts/centos/scripts/disable_ipv6.sh",
+        "custom_scripts/centos/scripts/vmware_tools.sh",
+        "{{user `template_root`}}/centos/scripts/cleanup.sh",
+        "{{user `template_root`}}/_common/minimize.sh"
+      ],
+      "type": "shell"
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "manifest",
+      "output": "manifest.json",
+      "strip_path": true
+    }
+  ]
+}
