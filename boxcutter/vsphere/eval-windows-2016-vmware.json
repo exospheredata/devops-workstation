@@ -1,0 +1,104 @@
+{
+  "variables": {
+    "vcenter_host": "",
+    "vcenter_user": "",
+    "vcenter_password": "",
+    "winrm_user": "vagrant",
+    "winrm_password": "vagrant",
+    "dc": "",
+    "cluster": "",
+    "network": "VM Network",
+    "vm_datastore": "",
+    "template_dir": "Templates",
+    "template_name": "eval-win2016-standard",
+    "iso_datastore": "",
+    "iso_path": "",
+    "cpu_cores": "2",
+    "ram_mb": "2048",
+    "cm": "chef",
+    "cm_version": "",
+    "disk_size_gb": "50",
+    "update": "true",
+    "version": "0.1.0",
+    "template_root": "windows"
+  },
+
+  "builders": [{
+    "type": "vsphere-iso",
+    "communicator": "winrm",
+
+    "vcenter_server": "{{ user `vcenter_host` }}",
+    "username": "{{ user `vcenter_user` }}",
+    "password": "{{ user `vcenter_password` }}",
+    "insecure_connection": "true",
+    "ssh_username": "{{ user `winrm_user` }}",
+    "ssh_password": "{{ user `winrm_password` }}",
+
+    "datacenter": "{{ user `dc` }}",
+    "cluster": "{{ user `cluster` }}",
+    "network": "{{ user `network` }}",
+    "network_card": "e1000",
+    "datastore": "{{ user `vm_datastore` }}",
+    "vm_name": "{{ user `template_name` }}",
+    "guest_os_type": "windows9Server64Guest",
+
+    "CPUs": "{{ user `cpu_cores` }}",
+    "RAM": "{{ user `ram_mb` }}",
+    "RAM_reserve_all": false,
+
+    "disk_controller_type": "lsilogic-sas",
+    "disk_size": "{{ user `disk_size_gb` }}",
+    "disk_thin_provisioned": true,
+    "folder": "{{ user `template_dir` }}",
+
+    "winrm_password": "{{ user `winrm_user` }}",
+    "winrm_timeout": "10000s",
+    "winrm_username": "{{ user `winrm_password` }}",
+
+    "iso_paths": [
+      "[{{ user `iso_datastore` }}] {{ user `iso_path` }}",
+      "[] /vmimages/tools-isoimages/windows.iso"
+    ],
+    "floppy_files": [
+        "{{user `template_root`}}/floppy/00-run-all-scripts.cmd",
+        "{{user `template_root`}}/floppy/01-install-wget.cmd",
+        "{{user `template_root`}}/floppy/_download.cmd",
+        "{{user `template_root`}}/floppy/_packer_config.cmd",
+        "{{user `template_root`}}/floppy/disablewinupdate.bat",
+        "{{user `template_root`}}/floppy/eval-win2016-standard/Autounattend.xml",
+        "{{user `template_root`}}/floppy/fixnetwork.ps1",
+        "{{user `template_root`}}/floppy/install-winrm.cmd",
+        "{{user `template_root`}}/floppy/passwordchange.bat",
+        "{{user `template_root`}}/floppy/powerconfig.bat",
+        "{{user `template_root`}}/floppy/zz-start-transports.cmd",
+        "custom_scripts/windows/zz-install-vmware-tools.cmd"
+      ],
+    "boot_order": "disk,cdrom",
+    "convert_to_template": false
+  }],
+  "provisioners": [
+    {
+      "environment_vars": [
+        "CM={{user `cm`}}",
+        "CM_VERSION={{user `cm_version`}}",
+        "UPDATE={{user `update`}}"
+      ],
+      "scripts": [
+        "{{user `template_root`}}/script/vagrant.bat",
+        "{{user `template_root`}}/script/cmtool.bat",
+        "{{user `template_root`}}/script/clean.bat",
+        "{{user `template_root`}}/script/ultradefrag.bat",
+        "{{user `template_root`}}/script/uninstall-7zip.bat",
+        "{{user `template_root`}}/script/sdelete.bat"
+      ],
+      "type": "windows-shell"
+    }
+  ],
+  "post-processors": [
+    {
+      "type": "manifest",
+      "output": "manifest.json",
+      "strip_path": true
+    }
+  ]
+}

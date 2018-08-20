@@ -1,0 +1,23 @@
+{
+  "vcenter_host": "",
+  "vcenter_user": "",
+  "vcenter_password": "",
+  "winrm_user": "vagrant",
+  "winrm_password": "vagrant",
+  "dc": "",
+  "cluster": "",
+  "network": "VM Network",
+  "vm_datastore": "",
+  "template_dir": "Templates",
+  "template_name": "eval-win2016-standard",
+  "iso_datastore": "",
+  "iso_path": "",
+  "cpu_cores": "2",
+  "ram_mb": "2048",
+  "cm": "chef",
+  "cm_version": "",
+  "disk_size_gb": "50",
+  "update": "true",
+  "version": "0.1.0",
+  "template_root": "windows"
+}
