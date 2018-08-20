@@ -1,0 +1,6 @@
+[submodule "boxcutter/windows"]
+	path = boxcutter/windows
+	url = https://github.com/boxcutter/windows
+[submodule "boxcutter/linux"]
+	path = boxcutter/linux
+	url = https://github.com/chef/bento
