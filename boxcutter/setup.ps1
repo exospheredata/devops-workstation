@@ -1,6 +1,8 @@
 Param(
   [Parameter(Mandatory=$true,HelpMessage="Please enter the DataStore to which the ISO will be loaded.", Position=1)]
   [string]$DataStore
+  [Parameter(Mandatory=$true,HelpMessage="Please enter the Vcenter Server to which the ISO will be loaded.", Position=2)]
+  [string]$Vcenter
  )
 
 function github_downloader {
@@ -98,7 +100,7 @@ function iso_downloader {
   }
 
   try {
-    Connect-VIServer -Server vc1
+    Connect-VIServer -Server $Vcenter
     $datastore = Get-Datastore $RemoteDatastore
     New-PSDrive -Location $datastore -Name exsds -PSProvider VimDatastore -Root "\" -ErrorAction SilentlyContinue
     New-Item -Path exsds:\packer_cache -ItemType Directory -ErrorAction SilentlyContinue
